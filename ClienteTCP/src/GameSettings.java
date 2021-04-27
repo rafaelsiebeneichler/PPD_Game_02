@@ -14,6 +14,7 @@ public class GameSettings {
     private int height = 320;
     private int width = 320;
     private String[][] map = new String[20][20];
+    private String letraJogador = " ";
 
     public void preencheMatriz() {
         for (int i = 0; i < 20; i++) {
@@ -81,4 +82,12 @@ public class GameSettings {
         this.width = width;
     }
 
+    public String getLetraJogador() {
+        return letraJogador;
+    }
+
+    public void setLetraJogador(String letraJogador) {
+        this.letraJogador = letraJogador;
+    }
+    
 }

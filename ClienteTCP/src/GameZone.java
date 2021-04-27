@@ -56,21 +56,16 @@ public class GameZone extends JPanel {
     private void drawMsg(Graphics g, int x, int y, String[][] msg) {
         for (int i = 0; i < msg[0].length; i++) {
             for (int j = 0; j < msg.length; j++) {
-                switch (msg[j][i]) {
-                    case ".":
-                        g.setColor(Color.gray);
-                        break;
-                    case "-":
-                        g.setColor(Color.black);
-                        break;
-                    case "A":
-                        g.setColor(Color.red);
-                        break;
-                    default:
-                        g.setColor(Color.gray);
-                        break;
-                }
-
+                String pos = msg[j][i];
+                if (pos.equals(".")) {
+                    g.setColor(Color.gray);
+                } else if (pos.equals("-")) {
+                    g.setColor(Color.black);
+                } else if (pos.equals(gs.getLetraJogador())) {
+                    g.setColor(Color.green);
+                } else {
+                    g.setColor(Color.red);
+                } 
                 //g.drawOval((i + x) * gs.getPixelSize() - gs.getPixelSize(), (j + y) * gs.getPixelSize() - gs.getPixelSize(), gs.getPixelSize(), gs.getPixelSize());
                 //g.fillOval((i + x) * gs.getPixelSize() - gs.getPixelSize(), (j + y) * gs.getPixelSize() - gs.getPixelSize(), gs.getPixelSize(), gs.getPixelSize());
                 g.drawRect((i + x) * gs.getPixelSize() - gs.getPixelSize(), (j + y) * gs.getPixelSize() - gs.getPixelSize(), gs.getPixelSize(), gs.getPixelSize());
