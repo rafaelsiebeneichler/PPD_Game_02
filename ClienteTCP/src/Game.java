@@ -4,6 +4,9 @@ import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
+import static java.lang.Thread.sleep;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 
 /*
@@ -16,6 +19,27 @@ import javax.swing.JFrame;
  * @author rafaelsiebeneichler
  */
 public class Game {
+
+    class RepaintScreen implements Runnable {
+
+        private Game g;
+
+        public RepaintScreen(Game g) {
+            this.g = g;
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    g.repaint();
+                    sleep(100);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
 
     private final JFrame frame = new JFrame("Labirint Warzone - TCP");
     private GameSettings gs = new GameSettings();
@@ -68,8 +92,6 @@ public class Game {
                     default:
                         break;
                 }
-                gs.readStringMap(conn.Echo("getMapa"));
-                desenha();
             }
 
             @Override
@@ -107,6 +129,8 @@ public class Game {
         conn = new Echo();
         try {
             init();
+            RepaintScreen rs = new RepaintScreen(this);
+            rs.run();
         } catch (IOException | ClassNotFoundException e) {
 
         }
@@ -116,8 +140,6 @@ public class Game {
     private void init() throws IOException, ClassNotFoundException {
         String lLetra = conn.Echo("sorteiaLetra;");
         gs.setLetraJogador(lLetra);
-        String lMapa = conn.Echo("getMapa;");
-        gs.readStringMap(lMapa);
     }
 
     private void desenha() {
@@ -126,5 +148,10 @@ public class Game {
             Thread.sleep(45);
         } catch (java.lang.InterruptedException e) {
         }
+    }
+
+    public void repaint() {
+        gs.readStringMap(conn.Echo("getMapa"));
+        desenha();
     }
 }
