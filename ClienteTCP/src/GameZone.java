@@ -28,7 +28,7 @@ public class GameZone extends JPanel {
         g.setColor(Color.black);
 
         if (gs.getMap().length > 0) {
-           drawMsg(g, 1, 1, gs.getMap());
+            drawMsg(g, 1, 1, gs.getMap());
         }
         g.setColor(Color.black);
 
@@ -56,21 +56,25 @@ public class GameZone extends JPanel {
     private void drawMsg(Graphics g, int x, int y, String[][] msg) {
         for (int i = 0; i < msg[0].length; i++) {
             for (int j = 0; j < msg.length; j++) {
-                if (msg[j][i].equals(".")) {
-                    switch (msg[j][i]) {
-                        case "-":
-                            g.setColor(Color.black);
-                            break;
-                        default:
-                            g.setColor(Color.gray);
-                            break;
-                    }
-
-                    //g.drawOval((i + x) * gs.getPixelSize() - gs.getPixelSize(), (j + y) * gs.getPixelSize() - gs.getPixelSize(), gs.getPixelSize(), gs.getPixelSize());
-                    //g.fillOval((i + x) * gs.getPixelSize() - gs.getPixelSize(), (j + y) * gs.getPixelSize() - gs.getPixelSize(), gs.getPixelSize(), gs.getPixelSize());
-                    g.drawRect((i + x) * gs.getPixelSize() - gs.getPixelSize(), (j + y) * gs.getPixelSize() - gs.getPixelSize(), gs.getPixelSize(), gs.getPixelSize());
-                    g.fillRect((i + x) * gs.getPixelSize() - gs.getPixelSize(), (j + y) * gs.getPixelSize() - gs.getPixelSize(), gs.getPixelSize(), gs.getPixelSize());
+                switch (msg[j][i]) {
+                    case ".":
+                        g.setColor(Color.gray);
+                        break;
+                    case "-":
+                        g.setColor(Color.black);
+                        break;
+                    case "A":
+                        g.setColor(Color.red);
+                        break;
+                    default:
+                        g.setColor(Color.gray);
+                        break;
                 }
+
+                //g.drawOval((i + x) * gs.getPixelSize() - gs.getPixelSize(), (j + y) * gs.getPixelSize() - gs.getPixelSize(), gs.getPixelSize(), gs.getPixelSize());
+                //g.fillOval((i + x) * gs.getPixelSize() - gs.getPixelSize(), (j + y) * gs.getPixelSize() - gs.getPixelSize(), gs.getPixelSize(), gs.getPixelSize());
+                g.drawRect((i + x) * gs.getPixelSize() - gs.getPixelSize(), (j + y) * gs.getPixelSize() - gs.getPixelSize(), gs.getPixelSize(), gs.getPixelSize());
+                g.fillRect((i + x) * gs.getPixelSize() - gs.getPixelSize(), (j + y) * gs.getPixelSize() - gs.getPixelSize(), gs.getPixelSize(), gs.getPixelSize());
             }
         }
     }

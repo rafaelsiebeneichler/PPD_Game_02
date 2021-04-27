@@ -1,31 +1,85 @@
+
+import java.util.HashMap;
+import java.util.Map;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author rafaelsiebeneichler
  */
 public class Game {
-    
+
     /* MATRIZ HELP
     . = chão
     - = parede
     * = tiro
     A-Z = Campeão
     a-z = bot
-    */
-
+     */
     //MATRIZ
     private int getAltura = 20;
     private int getLargura = 20;
     private char[][] getMatriz = new char[getAltura][getLargura];
 
+    class Jogador {
+
+        char jogador = ' ';
+        int jogoAtual = 0;
+        int killCountPlayers = 0;
+        int killCountBots = 0;
+        int vitorias = 0;
+        int derrotas = 0;
+        int qtdJogos = 0;
+        int x = 9999;
+        int y = 9999;
+        String inetAdress = "Unknow";
+        long timeLastMove = 0;
+
+        public Jogador(char letra, int nJogo) {
+            jogador = letra;
+            jogoAtual = nJogo;
+            timeLastMove = System.currentTimeMillis();
+        }
+    }
+
+    private char[] letras = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}; //vetor de letras para os jogadores
+    private Map<Character, Jogador> jogadores = new HashMap<Character, Jogador>(); //map de jogadores
+    private int contLetraHeroi = 0;
+    private int numJogo = 0;
+
     public Game() {
         preencheLabirinto1();
         // System.out.println(imprimirMatriz());
+    }
+
+    public char sorteiaLetra() {
+        char jogador = '&';
+        for (int i = contLetraHeroi; i < letras.length; i++) {
+            contLetraHeroi++;
+            jogador = letras[i];
+            jogadores.put(jogador, new Jogador(jogador, numJogo));
+            return jogador;
+        }
+        return jogador;
+    }
+
+    public void sorteiaPosicao(char jogador) {
+        jogadores.get(jogador).qtdJogos = jogadores.get(jogador).qtdJogos + 1;
+        int linha = 0 + (int) (Math.random() * (getAltura - 1)); //sorteia número da linha
+        jogadores.get(jogador).x = linha;
+        int coluna = 0 + (int) (Math.random() * (getLargura - 1)); //sorteia número da coluna
+        jogadores.get(jogador).y = coluna;
+        while (getMatriz[linha][coluna] != '.') { //se a posição sorteada for diferente de chão limpo, sorteia novamente
+            linha = 0 + (int) (Math.random() * (getAltura - 1)); //sorteia número da linha
+            jogadores.get(jogador).x = linha;
+            coluna = 0 + (int) (Math.random() * (getLargura - 1)); //sorteia número da coluna
+            jogadores.get(jogador).y = coluna;
+        }
+        getMatriz[linha][coluna] = jogador; //coloca jogador na posição sorteada (linha e coluna)
     }
 
     public void preencheMatriz() {
