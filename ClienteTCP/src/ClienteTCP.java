@@ -23,10 +23,6 @@ public class ClienteTCP {
             String mens = (String) entrada.readObject();
             gs.readStringMap(mens);
             g.desenha();
-            System.out.println("Mapa: ");
-            System.out.println(mens);
-            System.out.println("Mapa releito: ");
-            System.out.println(gs.imprimirMatriz());
 
             entrada.close();
             saida.close();
