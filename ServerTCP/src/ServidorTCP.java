@@ -1,3 +1,4 @@
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
@@ -8,6 +9,8 @@ public class ServidorTCP {
     public static final int PORTA = 5000;
 
     public static void main(String[] args) {
+        
+        Game g = new Game();
 
         String mensagem = "A vaca morreu ontem de noite";
 
@@ -24,15 +27,18 @@ public class ServidorTCP {
                 ObjectOutputStream saida = new ObjectOutputStream(cliente.getOutputStream());
                 ObjectInputStream entrada = new ObjectInputStream(cliente.getInputStream());
 
+                System.out.println("Recebendo a mensagem");
+                String resposta = (String) entrada.readObject();
+                System.out.println("O cliente pediu:\n" + resposta);
+                
+                if (resposta.equals("getMapa")){
+                    mensagem = g.imprimirMatriz();
+                }
+                
                 System.out.println("Limpando o buffer e enviando mensagem");
                 saida.flush();
                 saida.writeObject(mensagem);
 
-                System.out.println("Recebendo a mensagem");
-                String resposta = (String) entrada.readObject();
-
-                System.out.println("O cliente respondeu:\n" + resposta);
-                
                 System.out.println("Conexão encerrada");
 
                 saida.close();
