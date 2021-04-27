@@ -44,12 +44,16 @@ public class Game {
                     case KeyEvent.VK_P:
                         break;
                     case KeyEvent.VK_RIGHT:
+                        conn.Echo("movimento;" + gs.getLetraJogador() + ";d;");
                         break;
                     case KeyEvent.VK_LEFT:
+                        conn.Echo("movimento;" + gs.getLetraJogador() + ";a;");
                         break;
                     case KeyEvent.VK_UP:
+                        conn.Echo("movimento;" + gs.getLetraJogador() + ";w;");
                         break;
                     case KeyEvent.VK_DOWN:
+                        conn.Echo("movimento;" + gs.getLetraJogador() + ";s;");
                         break;
                     case KeyEvent.VK_ESCAPE:
                         break;
@@ -64,6 +68,8 @@ public class Game {
                     default:
                         break;
                 }
+                gs.readStringMap(conn.Echo("getMapa"));
+                desenha();
             }
 
             @Override

@@ -30,7 +30,7 @@ public class WorkerRunnable implements Runnable {
             System.out.println("O cliente " + clientSocket.getInetAddress() + " enviou: " + received);
             String array[] = new String[3]; //criar um array de três posições
             array = received.split(";");
-            
+
             String mensagem = "";
             if (array[0].equals("getMapa")) {
                 mensagem = game.imprimirMatriz();
@@ -38,6 +38,8 @@ public class WorkerRunnable implements Runnable {
                 char j = game.sorteiaLetra(); //adiciona a letra sorteada ao herói
                 mensagem = "" + j;
                 game.sorteiaPosicao(j); //sorteia posição do herói
+            } else if (array[0].equals("movimento")) { //verifica se a primeira parte do "Stringão" é movimento
+                mensagem = game.moverJogador(array[1].charAt(0), array[2]);
             }
 
             System.out.println("Limpando o buffer e retornando cliente " + clientSocket.getInetAddress());

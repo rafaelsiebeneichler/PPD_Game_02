@@ -81,6 +81,52 @@ public class Game {
         }
         getMatriz[linha][coluna] = jogador; //coloca jogador na posição sorteada (linha e coluna)
     }
+    
+    public String moverJogador(char jogador, String comando) {
+        String ret = "OK";
+        comando = comando.toLowerCase();
+        int x = jogadores.get(jogador).x;
+        int y = jogadores.get(jogador).y;
+        if (comando.equals("w")) {
+            if (x > 0) {
+                ret = verificarJogador(x - 1, y, jogador, x, y);
+            }
+        } else if (comando.equals("s")) {
+            if (x < (getAltura - 1)) {
+                ret = verificarJogador(x + 1, y, jogador, x, y);
+            }
+        } else if (comando.equals("a")) {
+            if (y > 0) {
+                ret = verificarJogador(x, y - 1, jogador, x, y);
+            }
+        } else if (comando.equals("d")) {
+            if (y < (getLargura - 1)) {
+                ret = verificarJogador(x, y + 1, jogador, x, y);
+            }
+        }
+        return ret;
+    }
+    
+    public String verificarJogador(int x, int y, char jogador, int xa, int ya) {
+        String ret = "OK";
+        Boolean lTemLetra = false;
+        for (int i = 0; i < letras.length; i++) {
+            if (!lTemLetra) {
+                lTemLetra = getMatriz[x][y] == letras[i];
+            }
+        }
+        if (lTemLetra) {
+            //Faz nada
+        } else if (getMatriz[x][y] == '-') {
+            //Se é parede faz nada
+        } else {
+            getMatriz[xa][ya] = '.';
+            getMatriz[x][y] = jogador;
+            jogadores.get(jogador).x = x;
+            jogadores.get(jogador).y = y;
+        }
+        return ret;
+    }
 
     public void preencheMatriz() {
         for (int i = 0; i < getAltura; i++) {
