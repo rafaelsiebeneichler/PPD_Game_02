@@ -32,13 +32,14 @@ public class Game {
     class Shot implements Runnable {
 
         private int x, y;
-        private char direcao;
+        private char direcao, jogador;
         private char[][] map;
 
-        public Shot(int x, int y, char direcao) {
+        public Shot(int x, int y, char direcao, char jogador) {
             this.x = x;
             this.y = y;
             this.direcao = direcao;
+            this.jogador = jogador;
             this.map = map;
         }
 
@@ -67,6 +68,7 @@ public class Game {
 
         @Override
         public void run() {
+            jogadores.get(jogador).lastTimeShot = System.currentTimeMillis();
             if (this.direcao == 'w') {
                 x = x - 1;
             } else if (this.direcao == 's') {
@@ -76,9 +78,10 @@ public class Game {
             } else if (this.direcao == 'd') {
                 y = y + 1;
             }
-            Boolean lHit = false;
-            while (lHit == false) {
-                try {
+            int lCount = 0;
+            try {
+                Boolean lHit = false;
+                while (lHit == false) {
                     if (this.direcao == 'w') {
                         if (x > 0) {
                             lHit = verificarShot(x - 1, y, x, y);
@@ -112,11 +115,10 @@ public class Game {
                             lHit = true;
                         }
                     }
-
                     sleep(100);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -125,6 +127,7 @@ public class Game {
 
         char jogador = ' ';
         boolean morreu = false;
+        long lastTimeShot = 0;
         char direcao = ' ';
         int jogoAtual = 0;
         int killCountPlayers = 0;
@@ -211,7 +214,9 @@ public class Game {
 
     public String atirarJogador(char jogador) {
         String ret = "OK";
-        new Thread(new Shot(jogadores.get(jogador).x, jogadores.get(jogador).y, jogadores.get(jogador).direcao)).start();
+        if ((System.currentTimeMillis() - jogadores.get(jogador).lastTimeShot) > 500) {
+            new Thread(new Shot(jogadores.get(jogador).x, jogadores.get(jogador).y, jogadores.get(jogador).direcao, jogador)).start();
+        }
         return ret;
     }
 
