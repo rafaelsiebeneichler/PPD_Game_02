@@ -82,6 +82,7 @@ public class Game {
                     case KeyEvent.VK_ESCAPE:
                         break;
                     case KeyEvent.VK_SPACE:
+                        conn.Echo("atirar;" + gs.getLetraJogador() + ";");
                         break;
                     case KeyEvent.VK_S:
                         break;

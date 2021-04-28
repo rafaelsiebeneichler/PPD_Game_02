@@ -1,6 +1,10 @@
 
+import java.io.IOException;
+import static java.lang.Thread.sleep;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -25,9 +29,103 @@ public class Game {
     private int getLargura = 20;
     private char[][] getMatriz = new char[getAltura][getLargura];
 
+    class Shot implements Runnable {
+
+        private int x, y;
+        private char direcao;
+        private char[][] map;
+
+        public Shot(int x, int y, char direcao) {
+            this.x = x;
+            this.y = y;
+            this.direcao = direcao;
+            this.map = map;
+        }
+
+        private Boolean verificarShot(int x, int y, int xa, int ya) {
+            Boolean lHit = false;
+            Boolean lTemLetra = false;
+            char lJogador = ' ';
+            for (int i = 0; i < letras.length; i++) {
+                if (!lTemLetra) {
+                    lTemLetra = getMatriz[x][y] == letras[i];
+                    lJogador = letras[i];
+                }
+            }
+            if (lTemLetra) {
+                jogadores.get(lJogador).morreu = true;
+                lHit = true;
+            } else if (getMatriz[x][y] == '-') {
+                getMatriz[xa][ya] = '.';
+                lHit = true;
+            } else {
+                getMatriz[xa][ya] = '.';
+                getMatriz[x][y] = '*';
+            }
+            return lHit;
+        }
+
+        @Override
+        public void run() {
+            if (this.direcao == 'w') {
+                x = x - 1;
+            } else if (this.direcao == 's') {
+                x = x + 1;
+            } else if (this.direcao == 'a') {
+                y = y - 1;
+            } else if (this.direcao == 'd') {
+                y = y + 1;
+            }
+            Boolean lHit = false;
+            while (lHit == false) {
+                try {
+                    if (this.direcao == 'w') {
+                        if (x > 0) {
+                            lHit = verificarShot(x - 1, y, x, y);
+                            x = x - 1;
+                        } else {
+                            getMatriz[x][y] = '.';
+                            lHit = true;
+                        }
+                    } else if (this.direcao == 's') {
+                        if (x < (getAltura - 1)) {
+                            lHit = verificarShot(x + 1, y, x, y);
+                            x = x + 1;
+                        } else {
+                            getMatriz[x][y] = '.';
+                            lHit = true;
+                        }
+                    } else if (this.direcao == 'a') {
+                        if (y > 0) {
+                            lHit = verificarShot(x, y - 1, x, y);
+                            y = y - 1;
+                        } else {
+                            getMatriz[x][y] = '.';
+                            lHit = true;
+                        }
+                    } else if (this.direcao == 'd') {
+                        if (y < (getLargura - 1)) {
+                            lHit = verificarShot(x, y + 1, x, y);
+                            y = y + 1;
+                        } else {
+                            getMatriz[x][y] = '.';
+                            lHit = true;
+                        }
+                    }
+
+                    sleep(100);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+
     class Jogador {
 
         char jogador = ' ';
+        boolean morreu = false;
+        char direcao = ' ';
         int jogoAtual = 0;
         int killCountPlayers = 0;
         int killCountBots = 0;
@@ -81,7 +179,7 @@ public class Game {
         }
         getMatriz[linha][coluna] = jogador; //coloca jogador na posição sorteada (linha e coluna)
     }
-    
+
     public String moverJogador(char jogador, String comando) {
         String ret = "OK";
         comando = comando.toLowerCase();
@@ -91,22 +189,32 @@ public class Game {
             if (x > 0) {
                 ret = verificarJogador(x - 1, y, jogador, x, y);
             }
+            jogadores.get(jogador).direcao = 'w';
         } else if (comando.equals("s")) {
             if (x < (getAltura - 1)) {
                 ret = verificarJogador(x + 1, y, jogador, x, y);
             }
+            jogadores.get(jogador).direcao = 's';
         } else if (comando.equals("a")) {
             if (y > 0) {
                 ret = verificarJogador(x, y - 1, jogador, x, y);
             }
+            jogadores.get(jogador).direcao = 'a';
         } else if (comando.equals("d")) {
             if (y < (getLargura - 1)) {
                 ret = verificarJogador(x, y + 1, jogador, x, y);
             }
+            jogadores.get(jogador).direcao = 'd';
         }
         return ret;
     }
-    
+
+    public String atirarJogador(char jogador) {
+        String ret = "OK";
+        new Thread(new Shot(jogadores.get(jogador).x, jogadores.get(jogador).y, jogadores.get(jogador).direcao)).start();
+        return ret;
+    }
+
     public String verificarJogador(int x, int y, char jogador, int xa, int ya) {
         String ret = "OK";
         Boolean lTemLetra = false;

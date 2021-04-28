@@ -61,6 +61,8 @@ public class GameZone extends JPanel {
                     g.setColor(Color.gray);
                 } else if (pos.equals("-")) {
                     g.setColor(Color.black);
+                } else if (pos.equals("*")) {
+                    g.setColor(Color.blue);                    
                 } else if (pos.equals(gs.getLetraJogador())) {
                     g.setColor(Color.green);
                 } else {

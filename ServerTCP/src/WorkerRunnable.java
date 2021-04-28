@@ -34,12 +34,14 @@ public class WorkerRunnable implements Runnable {
             String mensagem = "";
             if (array[0].equals("getMapa")) {
                 mensagem = game.imprimirMatriz();
-            } else if (array[0].equals("sorteiaLetra")) { //verifica se a primeira parte do "Stringão" é sorteiaLetraHeroi
-                char j = game.sorteiaLetra(); //adiciona a letra sorteada ao herói
+            } else if (array[0].equals("sorteiaLetra")) {
+                char j = game.sorteiaLetra(); 
                 mensagem = "" + j;
-                game.sorteiaPosicao(j); //sorteia posição do herói
-            } else if (array[0].equals("movimento")) { //verifica se a primeira parte do "Stringão" é movimento
+                game.sorteiaPosicao(j); //sorteia posição
+            } else if (array[0].equals("movimento")) { 
                 mensagem = game.moverJogador(array[1].charAt(0), array[2]);
+            } else if (array[0].equals("atirar")) { 
+                mensagem = game.atirarJogador(array[1].charAt(0));
             }
 
             System.out.println("Limpando o buffer e retornando cliente " + clientSocket.getInetAddress());
