@@ -55,6 +55,8 @@ public class Game {
             }
             if (lTemLetra) {
                 jogadores.get(lJogador).morreu = true;
+                getMatriz[xa][ya] = '.';
+                getMatriz[x][y] = '.';
                 lHit = true;
             } else if (getMatriz[x][y] == '-') {
                 getMatriz[xa][ya] = '.';
@@ -185,6 +187,9 @@ public class Game {
 
     public String moverJogador(char jogador, String comando) {
         String ret = "OK";
+        if (jogadores.get(jogador).morreu) {
+            return "MORREU";
+        }
         comando = comando.toLowerCase();
         int x = jogadores.get(jogador).x;
         int y = jogadores.get(jogador).y;

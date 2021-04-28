@@ -64,20 +64,21 @@ public class Game {
         frame.addKeyListener(new KeyListener() {
             @Override
             public void keyPressed(KeyEvent e) {
+                String lMvto = "OK";
                 switch (e.getKeyCode()) {
                     case KeyEvent.VK_P:
                         break;
                     case KeyEvent.VK_RIGHT:
-                        conn.Echo("movimento;" + gs.getLetraJogador() + ";d;");
+                        lMvto = conn.Echo("movimento;" + gs.getLetraJogador() + ";d;");
                         break;
                     case KeyEvent.VK_LEFT:
-                        conn.Echo("movimento;" + gs.getLetraJogador() + ";a;");
+                        lMvto = conn.Echo("movimento;" + gs.getLetraJogador() + ";a;");
                         break;
                     case KeyEvent.VK_UP:
-                        conn.Echo("movimento;" + gs.getLetraJogador() + ";w;");
+                        lMvto = conn.Echo("movimento;" + gs.getLetraJogador() + ";w;");
                         break;
                     case KeyEvent.VK_DOWN:
-                        conn.Echo("movimento;" + gs.getLetraJogador() + ";s;");
+                        lMvto = conn.Echo("movimento;" + gs.getLetraJogador() + ";s;");
                         break;
                     case KeyEvent.VK_ESCAPE:
                         break;
@@ -92,6 +93,9 @@ public class Game {
                         break;
                     default:
                         break;
+                }
+                if (lMvto.equals("MORREU")) {
+                    System.out.println("Você morreu, reconecte para jogar novamente!");
                 }
             }
 
