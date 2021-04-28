@@ -62,12 +62,16 @@ public class GameZone extends JPanel {
                 } else if (pos.equals("-")) {
                     g.setColor(Color.black);
                 } else if (pos.equals("*")) {
-                    g.setColor(Color.blue);                    
+                    g.setColor(Color.blue);
                 } else if (pos.equals(gs.getLetraJogador())) {
                     g.setColor(Color.green);
-                } else {
+                } else if (pos.matches("^[A-Z]")) {
                     g.setColor(Color.red);
-                } 
+                } else if (pos.matches("^[a-z]")) {
+                    g.setColor(Color.yellow);
+                } else {
+                    g.setColor(Color.white);
+                }
                 //g.drawOval((i + x) * gs.getPixelSize() - gs.getPixelSize(), (j + y) * gs.getPixelSize() - gs.getPixelSize(), gs.getPixelSize(), gs.getPixelSize());
                 //g.fillOval((i + x) * gs.getPixelSize() - gs.getPixelSize(), (j + y) * gs.getPixelSize() - gs.getPixelSize(), gs.getPixelSize(), gs.getPixelSize());
                 g.drawRect((i + x) * gs.getPixelSize() - gs.getPixelSize(), (j + y) * gs.getPixelSize() - gs.getPixelSize(), gs.getPixelSize(), gs.getPixelSize());

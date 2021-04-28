@@ -1,5 +1,4 @@
 
-import java.io.IOException;
 import static java.lang.Thread.sleep;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,17 +32,15 @@ public class Game {
 
         private int x, y;
         private char direcao, jogador;
-        private char[][] map;
 
         public Shot(int x, int y, char direcao, char jogador) {
             this.x = x;
             this.y = y;
             this.direcao = direcao;
             this.jogador = jogador;
-            this.map = map;
         }
 
-        private Boolean verificarShot(int x, int y, int xa, int ya) {
+        private Boolean verificarShot(int x, int y, int xa, int ya, int x0, int y0) {
             Boolean lHit = false;
             Boolean lTemLetra = false;
             char lJogador = ' ';
@@ -53,16 +50,38 @@ public class Game {
                     lJogador = letras[i];
                 }
             }
+            Boolean lTemBot = false;
+            char lBot = ' ';
+            for (int i = 0; i < letrasBots.length; i++) {
+                if (!lTemBot) {
+                    lTemBot = getMatriz[x][y] == letrasBots[i];
+                    lBot = letrasBots[i];
+                }
+            }
             if (lTemLetra) {
                 jogadores.get(lJogador).morreu = true;
-                getMatriz[xa][ya] = '.';
+                if ((x0 != xa) || (y0 != ya)) {
+                    getMatriz[xa][ya] = '.';
+                }
                 getMatriz[x][y] = '.';
                 lHit = true;
+            } else if (lTemBot) {
+                bots.get(lBot).morreu = true;
+                if ((x0 != xa) || (y0 != ya)) {
+                    getMatriz[xa][ya] = '.';
+                }
+                getMatriz[x][y] = '.';
+                lHit = true;
+                new Thread(new ReBot(lBot, 1500)).start();
             } else if (getMatriz[x][y] == '-') {
-                getMatriz[xa][ya] = '.';
+                if ((x0 != xa) || (y0 != ya)) {
+                    getMatriz[xa][ya] = '.';
+                }
                 lHit = true;
             } else {
-                getMatriz[xa][ya] = '.';
+                if ((x0 != xa) || (y0 != ya)) {
+                    getMatriz[xa][ya] = '.';
+                }
                 getMatriz[x][y] = '*';
             }
             return lHit;
@@ -71,54 +90,173 @@ public class Game {
         @Override
         public void run() {
             jogadores.get(jogador).lastTimeShot = System.currentTimeMillis();
-            if (this.direcao == 'w') {
-                x = x - 1;
-            } else if (this.direcao == 's') {
-                x = x + 1;
-            } else if (this.direcao == 'a') {
-                y = y - 1;
-            } else if (this.direcao == 'd') {
-                y = y + 1;
-            }
+            int x0 = x;
+            int y0 = y;
             int lCount = 0;
             try {
                 Boolean lHit = false;
                 while (lHit == false) {
                     if (this.direcao == 'w') {
                         if (x > 0) {
-                            lHit = verificarShot(x - 1, y, x, y);
+                            lHit = verificarShot(x - 1, y, x, y, x0, y0);
                             x = x - 1;
                         } else {
-                            getMatriz[x][y] = '.';
+                            if ((x0 != x) || (y0 != y)) {
+                                getMatriz[x][y] = '.';
+                            }
                             lHit = true;
                         }
                     } else if (this.direcao == 's') {
                         if (x < (getAltura - 1)) {
-                            lHit = verificarShot(x + 1, y, x, y);
+                            lHit = verificarShot(x + 1, y, x, y, x0, y0);
                             x = x + 1;
                         } else {
-                            getMatriz[x][y] = '.';
+                            if ((x0 != x) || (y0 != y)) {
+                                getMatriz[x][y] = '.';
+                            }
                             lHit = true;
                         }
                     } else if (this.direcao == 'a') {
                         if (y > 0) {
-                            lHit = verificarShot(x, y - 1, x, y);
+                            lHit = verificarShot(x, y - 1, x, y, x0, y0);
                             y = y - 1;
                         } else {
-                            getMatriz[x][y] = '.';
+                            if ((x0 != x) || (y0 != y)) {
+                                getMatriz[x][y] = '.';
+                            }
                             lHit = true;
                         }
                     } else if (this.direcao == 'd') {
                         if (y < (getLargura - 1)) {
-                            lHit = verificarShot(x, y + 1, x, y);
+                            lHit = verificarShot(x, y + 1, x, y, x0, y0);
                             y = y + 1;
                         } else {
-                            getMatriz[x][y] = '.';
+                            if ((x0 != x) || (y0 != y)) {
+                                getMatriz[x][y] = '.';
+                            }
                             lHit = true;
                         }
                     }
                     sleep(100);
                 }
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    class RoBot implements Runnable {
+
+        private char bot;
+
+        public RoBot(char bot) {
+            this.bot = bot;
+            bots.put(bot, new Bot(bot));
+        }
+
+        private String moverBot(char bot, String comando) {
+            String ret = "OK";
+            if (bots.get(bot).morreu) {
+                return "MORREU";
+            }
+            comando = comando.toLowerCase();
+            int x = bots.get(bot).x;
+            int y = bots.get(bot).y;
+            switch (comando) {
+                case "w":
+                    if (x > 0) {
+                        ret = verificarBot(x - 1, y, bot, x, y);
+                    }
+                    break;
+                case "s":
+                    if (x < (getAltura - 1)) {
+                        ret = verificarBot(x + 1, y, bot, x, y);
+                    }
+                    break;
+                case "a":
+                    if (y > 0) {
+                        ret = verificarBot(x, y - 1, bot, x, y);
+                    }
+                    break;
+                case "d":
+                    if (y < (getLargura - 1)) {
+                        ret = verificarBot(x, y + 1, bot, x, y);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return ret;
+        }
+
+        public String verificarBot(int x, int y, char bot, int xa, int ya) {
+            String ret = "OK";
+            Boolean lTemLetra = false;
+            for (int i = 0; i < letras.length; i++) {
+                if (!lTemLetra) {
+                    lTemLetra = getMatriz[x][y] == letras[i];
+                }
+            }
+            Boolean lTemBot = false;
+            for (int i = 0; i < letrasBots.length; i++) {
+                if (!lTemBot) {
+                    lTemBot = getMatriz[x][y] == letrasBots[i];
+                }
+            }
+            if (lTemLetra) {
+                //Faz nada
+            } else if (lTemBot) {
+                // Faz nada
+            } else if (getMatriz[x][y] == '-') {
+                //Se é parede faz nada
+            } else {
+                getMatriz[xa][ya] = '.';
+                getMatriz[x][y] = bot;
+                bots.get(bot).x = x;
+                bots.get(bot).y = y;
+            }
+            return ret;
+        }
+
+        @Override
+        public void run() {
+            sorteiaPosicaoBot(bot);
+            try {
+                while (!bots.get(bot).morreu) {
+                    int rand = (int) ((Math.random() * 4) + 1);
+                    if (rand == 1) {
+                        moverBot(bot, "w");
+                    } else if (rand == 2) {
+                        moverBot(bot, "s");
+                    } else if (rand == 3) {
+                        moverBot(bot, "a");
+                    } else if (rand == 4) {
+                        moverBot(bot, "d");
+                    }
+
+                    sleep(250);
+                }
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    class ReBot implements Runnable {
+
+        private char bot;
+        private int time;
+
+        public ReBot(char bot, int time) {
+            this.bot = bot;
+            this.time = time;
+        }
+
+        @Override
+        public void run() {
+            try {
+                sleep(this.time);
+                new Thread(new RoBot(bot)).start();
             } catch (InterruptedException ex) {
                 Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -149,14 +287,33 @@ public class Game {
         }
     }
 
+    class Bot {
+
+        char jogador = ' ';
+        boolean morreu = false;
+        int x = 9999;
+        int y = 9999;
+        long timeLastMove = 0;
+
+        public Bot(char letra) {
+            jogador = letra;
+            timeLastMove = System.currentTimeMillis();
+        }
+    }
+
     private char[] letras = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}; //vetor de letras para os jogadores
     private Map<Character, Jogador> jogadores = new HashMap<Character, Jogador>(); //map de jogadores
     private int contLetraHeroi = 0;
     private int numJogo = 0;
+    private char[] letrasBots = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'}; //vetor de letras para os bots
+    private Map<Character, Bot> bots = new HashMap<Character, Bot>(); //map de bots    
 
     public Game() {
         preencheLabirinto1();
         // System.out.println(imprimirMatriz());
+        new Thread(new RoBot('a')).start();
+        new Thread(new RoBot('b')).start();
+        new Thread(new RoBot('c')).start();
     }
 
     public char sorteiaLetra() {
@@ -183,6 +340,22 @@ public class Game {
             jogadores.get(jogador).y = coluna;
         }
         getMatriz[linha][coluna] = jogador; //coloca jogador na posição sorteada (linha e coluna)
+        jogadores.get(jogador).morreu = false;
+    }
+
+    public void sorteiaPosicaoBot(char bot) {
+        int linha = 0 + (int) (Math.random() * (getAltura - 1)); //sorteia número da linha
+        bots.get(bot).x = linha;
+        int coluna = 0 + (int) (Math.random() * (getLargura - 1)); //sorteia número da coluna
+        bots.get(bot).y = coluna;
+        while (getMatriz[linha][coluna] != '.') { //se a posição sorteada for diferente de chão limpo, sorteia novamente
+            linha = 0 + (int) (Math.random() * (getAltura - 1)); //sorteia número da linha
+            bots.get(bot).x = linha;
+            coluna = 0 + (int) (Math.random() * (getLargura - 1)); //sorteia número da coluna
+            bots.get(bot).y = coluna;
+        }
+        getMatriz[linha][coluna] = bot; //coloca jogador na posição sorteada (linha e coluna)
+        bots.get(bot).morreu = false;
     }
 
     public String moverJogador(char jogador, String comando) {
@@ -193,26 +366,33 @@ public class Game {
         comando = comando.toLowerCase();
         int x = jogadores.get(jogador).x;
         int y = jogadores.get(jogador).y;
-        if (comando.equals("w")) {
-            if (x > 0) {
-                ret = verificarJogador(x - 1, y, jogador, x, y);
-            }
-            jogadores.get(jogador).direcao = 'w';
-        } else if (comando.equals("s")) {
-            if (x < (getAltura - 1)) {
-                ret = verificarJogador(x + 1, y, jogador, x, y);
-            }
-            jogadores.get(jogador).direcao = 's';
-        } else if (comando.equals("a")) {
-            if (y > 0) {
-                ret = verificarJogador(x, y - 1, jogador, x, y);
-            }
-            jogadores.get(jogador).direcao = 'a';
-        } else if (comando.equals("d")) {
-            if (y < (getLargura - 1)) {
-                ret = verificarJogador(x, y + 1, jogador, x, y);
-            }
-            jogadores.get(jogador).direcao = 'd';
+        switch (comando) {
+            case "w":
+                if (x > 0) {
+                    ret = verificarJogador(x - 1, y, jogador, x, y);
+                }
+                jogadores.get(jogador).direcao = 'w';
+                break;
+            case "s":
+                if (x < (getAltura - 1)) {
+                    ret = verificarJogador(x + 1, y, jogador, x, y);
+                }
+                jogadores.get(jogador).direcao = 's';
+                break;
+            case "a":
+                if (y > 0) {
+                    ret = verificarJogador(x, y - 1, jogador, x, y);
+                }
+                jogadores.get(jogador).direcao = 'a';
+                break;
+            case "d":
+                if (y < (getLargura - 1)) {
+                    ret = verificarJogador(x, y + 1, jogador, x, y);
+                }
+                jogadores.get(jogador).direcao = 'd';
+                break;
+            default:
+                break;
         }
         return ret;
     }
@@ -233,8 +413,16 @@ public class Game {
                 lTemLetra = getMatriz[x][y] == letras[i];
             }
         }
+        Boolean lTemBot = false;
+        for (int i = 0; i < letrasBots.length; i++) {
+            if (!lTemBot) {
+                lTemBot = getMatriz[x][y] == letrasBots[i];
+            }
+        }
         if (lTemLetra) {
             //Faz nada
+        } else if (lTemBot) {
+            // Faz nada
         } else if (getMatriz[x][y] == '-') {
             //Se é parede faz nada
         } else {
@@ -265,7 +453,7 @@ public class Game {
         return matriz;
     }
 
-    public void preencheLabirinto1() {
+    private void preencheLabirinto1() {
         preencheMatriz();
         getMatriz[2][2] = '-';
         getMatriz[2][3] = '-';
